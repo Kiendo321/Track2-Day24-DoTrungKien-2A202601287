@@ -1,0 +1,3 @@
+# Kết quả sau khi contain (Bước 4):
+# sink.log rỗng (0 bytes) - Không có dữ liệu PII nào gửi tới http://localhost:9999/reconcile
+# Ledger ghi nhận decision=deny với lý do: "DENY: Truy cập dữ liệu restricted bị cấm khi egress_enabled=True"
