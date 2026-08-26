@@ -17,8 +17,8 @@ python -m agent.loop --mock "Tổng hợp các ticket còn mở tuần này"
   {"tool": "http_post", "classification": "restricted", "decision": "deny", "reason": "DENY: Truy cập dữ liệu restricted bị cấm khi egress_enabled=True (agent_owner=run-c)"}
   ```
 - **Bằng chứng trước & sau khi Containment**:
-  - Log tấn công thành công (Trước khi contain): [`reports/attack-before.log`](attack-before.log)
-  - Log tấn công bị chặn (Sau khi contain): [`reports/attack-after.log`](attack-after.log)
+  - Log tấn công thành công (Trước khi contain): `reports/attack-before.log`
+  - Log tấn công bị chặn (Sau khi contain): `reports/attack-after.log`
 
 ---
 
@@ -31,12 +31,12 @@ python -m agent.loop --mock "Tổng hợp các ticket còn mở tuần này"
 
 ### Câu hỏi 2: Nếu attacker có quyền ghi vào `corpus/`, control nào của bạn còn đứng vững?
 - **Trả lời**:
-  1. **Control Trifecta Split ([`agent/runner.py`](../agent/runner.py#L72-L109))**: Đứng vững hoàn toàn. Vì Run B chỉ đọc `customer_id` từ nguồn tin cậy (`related_tickets` trong `customers.json` gắn với `ticket_id` trích từ tên file), hoàn toàn bỏ qua mọi `customer_id` bị attacker cài cắm trong nội dung file `.md`.
-  2. **Control PEP Policy Check ([`agent/policy.py`](../agent/policy.py#L19-L43))**: Đứng vững hoàn toàn. Mọi yêu cầu egress (`http_post`) khi đang xử lý dữ liệu `restricted` đều bị chặn cứng (`decision=deny`).
-  3. **Control Audit Ledger ([`agent/ledger.py`](../agent/ledger.py#L19-L83))**: Đứng vững hoàn toàn. Mọi thao tác đều bị ghi lại trong chuỗi Hash Chain SHA-256 tamper-evident, attacker không thể sửa hay xóa log mà không bị phát hiện.
+  1. **Control Trifecta Split (`agent/runner.py` L72-L109)**: Đứng vững hoàn toàn. Vì Run B chỉ đọc `customer_id` từ nguồn tin cậy (`related_tickets` trong `customers.json` gắn với `ticket_id` trích từ tên file), hoàn toàn bỏ qua mọi `customer_id` bị attacker cài cắm trong nội dung file `.md`.
+  2. **Control PEP Policy Check (`agent/policy.py` L19-L43)**: Đứng vững hoàn toàn. Mọi yêu cầu egress (`http_post`) khi đang xử lý dữ liệu `restricted` đều bị chặn cứng (`decision=deny`).
+  3. **Control Audit Ledger (`agent/ledger.py` L19-L83)**: Đứng vững hoàn toàn. Mọi thao tác đều bị ghi lại trong chuỗi Hash Chain SHA-256 tamper-evident, attacker không thể sửa hay xóa log mà không bị phát hiện.
 
 ### Câu hỏi 3: Regulator hỏi "chứng minh dữ liệu khách hàng chưa từng ra khỏi hệ thống" — bạn mở file nào ra?
 - **Trả lời**:
-  1. Mở file **[`reports/ledger.jsonl`](ledger.jsonl)** và chạy mã kiểm tra toàn vẹn **`ledger.verify("reports/ledger.jsonl")`** để chứng minh chuỗi hash integrity không bị can thiệp.
+  1. Mở file **`reports/ledger.jsonl`** và chạy mã kiểm tra toàn vẹn **`ledger.verify("reports/ledger.jsonl")`** để chứng minh chuỗi hash integrity không bị can thiệp.
   2. Chỉ ra dòng log kiểm toán có `tool: "http_post"`, `decision: "deny"` kèm lý do pháp lý/chính sách trong trường `reason`.
-  3. Mở file **[`reports/sink.log`](sink.log)** (0 bytes) và **[`reports/attack-after.log`](attack-after.log)** làm bằng chứng vật lý rằng hệ thống mạng chưa từng truyền bất kỳ bản ghi PII nào ra ngoài sink.
+  3. Mở file **`reports/sink.log`** (0 bytes) và **`reports/attack-after.log`** làm bằng chứng vật lý rằng hệ thống mạng chưa từng truyền bất kỳ bản ghi PII nào ra ngoài sink.

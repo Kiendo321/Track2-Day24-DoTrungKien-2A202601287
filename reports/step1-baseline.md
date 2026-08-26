@@ -2,7 +2,7 @@
 
 ## 1. Sơ đồ hoạt động và Luồng gọi Tool của Agent (`_naive_loop`)
 
-Hàm `_naive_loop` trong [`agent/loop.py`](../agent/loop.py#L27-L55) thực thi luồng xử lý chưa có kiểm soát bảo mật như sau:
+Hàm `_naive_loop` trong `agent/loop.py` (L27-L55) thực thi luồng xử lý chưa có kiểm soát bảo mật như sau:
 
 ```mermaid
 flowchart TD
@@ -47,7 +47,7 @@ flowchart TD
 ### Câu hỏi 1: Agent này có identity riêng không (per-run, per-agent id)?
 * **Kết luận**: **KHÔNG**.
 * **Trích dẫn code**: 
-  - Tại [`agent/loop.py` - Dòng 27](../agent/loop.py#L27):
+  - Tại `agent/loop.py` - Dòng 27:
     ```python
     def _naive_loop(message: str, llm) -> str:
     ```
@@ -58,11 +58,11 @@ flowchart TD
 ### Câu hỏi 2: Ai quyết định nó được gọi `http_post`?
 * **Kết luận**: **Nội dung bị Prompt Injection do Attacker kiểm soát (Untrusted LLM Output)**.
 * **Trích dẫn code**:
-  - Tại [`agent/loop.py` - Dòng 34](../agent/loop.py#L34):
+  - Tại `agent/loop.py` - Dòng 34:
     ```python
     injected = llm.find_injection(combined_text)
     ```
-  - Tại [`agent/loop.py` - Dòng 35 & 44](../agent/loop.py#L35-L44):
+  - Tại `agent/loop.py` - Dòng 35 & 44:
     ```python
     if injected is not None:
         ...
@@ -75,8 +75,8 @@ flowchart TD
 ### Câu hỏi 3: Nếu nó gửi sai dữ liệu ra ngoài, bạn biết bằng cách nào?
 * **Kết luận**: **HOÀN TOÀN KHÔNG THỂ BIẾT ở phía Agent** (chỉ phát hiện được nếu xem log của server nhận bên ngoài `sink/sink.py`).
 * **Trích dẫn code**:
-  - Toàn bộ hàm `_naive_loop` từ [`agent/loop.py` - Dòng 27 đến 54](../agent/loop.py#L27-L54) không hề có bất kỳ câu lệnh ghi log hay kiểm toán nào (không có Audit Log / Audit Ledger).
-  - Khối `try...except` duy nhất tại [Dòng 45-51](../agent/loop.py#L45-L51):
+  - Toàn bộ hàm `_naive_loop` từ `agent/loop.py` - Dòng 27 đến 54 không hề có bất kỳ câu lệnh ghi log hay kiểm toán nào (không có Audit Log / Audit Ledger).
+  - Khối `try...except` duy nhất tại Dòng 45-51:
     ```python
     except Exception as exc:
         if "Connection refused" in str(exc) or "Max retries" in str(exc):
