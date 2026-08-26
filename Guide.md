@@ -182,13 +182,14 @@ là chuyển dữ liệu xuyên biên giới theo NĐ 356/2025.
 
 2. **Nếu attacker có quyền ghi vào `corpus/`, control nào của bạn còn đứng vững?**
    - **Trả lời**: **Cả 3 control kỹ thuật đều đứng vững 100%**:
-     - **Trifecta Split ([`agent/runner.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/runner.py#L64-L105))**: Đứng vững vì Run B chỉ đọc `customer_id` từ nguồn tin cậy (`related_tickets` trong `customers.json` gắn với `ticket_id` từ tên file), hoàn toàn bỏ qua mọi `customer_id` bị attacker cài cắm trong nội dung file `.md`.
-     - **PEP Policy Check ([`agent/policy.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/policy.py#L39-L57))**: Đứng vững vì rule `classification == "restricted" and egress_enabled == True` -> `DENY`.
-     - **Tamper-evident Audit Ledger ([`agent/ledger.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/ledger.py#L20-L80))**: Đứng vững vì chuỗi SHA-256 hash chain sẽ phát hiện ngay nếu log bị sửa xóa.
+     - **Trifecta Split ([`agent/runner.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/runner.py#L72-L109))**: Đứng vững vì Run B chỉ đọc `customer_id` từ nguồn tin cậy (`related_tickets` trong `customers.json` gắn với `ticket_id` từ tên file), hoàn toàn bỏ qua mọi `customer_id` bị attacker cài cắm trong nội dung file `.md`.
+     - **PEP Policy Check ([`agent/policy.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/policy.py#L19-L43))**: Đứng vững vì rule `classification == "restricted" and egress_enabled == True` -> `DENY`.
+     - **Tamper-evident Audit Ledger ([`agent/ledger.py`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/agent/ledger.py#L19-L83))**: Đứng vững vì chuỗi SHA-256 hash chain sẽ phát hiện ngay nếu log bị sửa xóa.
 
 3. **Regulator hỏi "chứng minh dữ liệu khách hàng chưa từng ra khỏi hệ thống" — bạn mở file nào ra?**
    - **Trả lời**:
      - Mở file **[`reports/ledger.jsonl`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/reports/ledger.jsonl)** và gọi **`ledger.verify("reports/ledger.jsonl")`** -> Trả về `True` (chứng minh log toàn vẹn).
      - Chỉ ra dòng log tại `http_post` có `decision: "deny"` và giải trình trong trường `reason`.
      - Mở file **[`reports/sink.log`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/reports/sink.log)** (rỗng 0 bytes) và **[`reports/attack-after.log`](file:///d:/VinAI_20K/Day24-Track2-Data-governance-security/reports/attack-after.log)** làm bằng chứng vật lý rằng không có dữ liệu PII nào thoát ra ngoài.
+
 
